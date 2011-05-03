@@ -78,4 +78,11 @@ class UPSTest < Test::Unit::TestCase
     assert Package.new((150 * 16) + 0.01, [5,5,5], :units => :imperial).mass > @carrier.maximum_weight
     assert Package.new((150 * 16) - 0.01, [5,5,5], :units => :imperial).mass < @carrier.maximum_weight
   end
+
+  def test_should_allow_for_empty_activity_location_for_intercepted_package_tracking_results
+    mock_response = xml_fixture('ups/intercepted_package_tracking_response')  
+    @carrier.expects(:commit).returns(mock_response)
+    tracking = @carrier.find_tracking_info(nil)
+    assert_equal "THE SHIPPER HAS REQUESTED A DELIVERY INTERCEPT FOR THIS PACKAGE / RETURN TO SENDER PENDING", tracking.shipment_events[0].name
+  end
 end
